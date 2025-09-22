@@ -1,3 +1,3 @@
-import Login from "@viasegura/modules/auth/pages/login/index";
+import Home from "@viasegura/modules/home/page";
 
-export default Login;
+export default Home;

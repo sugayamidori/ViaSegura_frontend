@@ -1,5 +1,3 @@
-// Em seu arquivo de Login
-
 "use client";
 
 import {

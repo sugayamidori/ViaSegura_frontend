@@ -161,7 +161,7 @@ export const LoginForm = () => {
         </Button>
         <div className="mb-2 text-center text-sm">
           Não tem uma conta? {""}
-          <Link href="/" className="text-primary hover:underline">
+          <Link href="/register" className="text-primary hover:underline">
             Clique aqui
           </Link>
         </div>
