@@ -27,19 +27,6 @@ const Header = () => {
             >
               Início
             </Link>
-            <Link
-              href="/mapa"
-              className="text-foreground/80 hover:text-foreground transition-colors"
-            >
-              Mapa de Calor
-            </Link>
-
-            <Link
-              href="#precos"
-              className="text-foreground/80 hover:text-foreground transition-colors"
-            >
-              Preços
-            </Link>
           </nav>
 
           <div className="flex items-center gap-4">
@@ -53,7 +40,7 @@ const Header = () => {
             </Link>
             <Link href="/register">
               <Button className="bg-gradient-primary hover:shadow-glow transition-all duration-300">
-                Começar Grátis
+                Registre-se
               </Button>
             </Link>
           </div>

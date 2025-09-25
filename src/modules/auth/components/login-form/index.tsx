@@ -49,7 +49,7 @@ export const LoginForm = () => {
           position: "bottom-right",
           style: { backgroundColor: "white", color: "#000", border: "none" },
         });
-        router.push("/");
+        router.push("/heat-map");
       } else {
         toast.error("Usuário ainda não cadastrado", {
           position: "bottom-right",
