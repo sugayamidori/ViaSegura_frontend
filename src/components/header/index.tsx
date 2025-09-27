@@ -27,6 +27,12 @@ const Header = () => {
             >
               Início
             </Link>
+            <Link
+              href="/"
+              className="text-foreground/80 hover:text-foreground transition-colors"
+            >
+              Api
+            </Link>
           </nav>
 
           <div className="flex items-center gap-4">

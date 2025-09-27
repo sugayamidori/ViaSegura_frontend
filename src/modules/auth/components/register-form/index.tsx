@@ -118,62 +118,12 @@ export const RegisterForm = () => {
         />
 
         <FormField
-          name="previewPassword"
-          render={({ field, fieldState }) => (
-            <FormItem className="relative mb-2">
-              <FormLabel htmlFor="password" className="text-foreground mt-5">
-                Senha
-              </FormLabel>
-              <FormControl>
-                <div
-                  className={`bg-muted border-border flex h-10 w-full items-center 
-                  justify-between gap-2 rounded-[4px] border-1 border-[#707070] 
-                  px-3 py-2 
-                  text-center focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 
-                  ${
-                    fieldState.error
-                      ? `focus-within:ring-rose-600`
-                      : `focus-within:ring-ring`
-                  }
-                `}
-                >
-                  <Input
-                    id="previewPassword"
-                    type={showPassword ? "text" : "password"}
-                    className="bg-muted pr-10 border-none shadow-none"
-                    name={field.name}
-                    onChange={(value) => value && field.onChange(value)}
-                    ref={field.ref}
-                    autoComplete="current-password"
-                    spellCheck={false}
-                    required
-                  />
-                  <span className="cursor-pointer leading-[0]">
-                    <button
-                      onClick={handleTogglePasswordVisibility}
-                      type="button"
-                      className="focus-visible:outline-primary cursor-pointer"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="text-gray-500" strokeWidth={1} />
-                      ) : (
-                        <Eye className="text-gray-500" strokeWidth={1} />
-                      )}
-                    </button>
-                  </span>
-                </div>
-              </FormControl>
-              <FormMessage className="absolute text-red-500 bottom-[-18px] right-0 block text-xs" />
-            </FormItem>
-          )}
-        />
-        <FormField
           control={form.control}
           name="password"
           render={({ field, fieldState }) => (
             <FormItem className="relative mb-2">
               <FormLabel htmlFor="password" className="text-foreground mt-5">
-                Confirme a senha
+                Senha
               </FormLabel>
               <FormControl>
                 <div

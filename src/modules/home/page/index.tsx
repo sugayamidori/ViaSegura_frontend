@@ -115,26 +115,30 @@ const Home = () => {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Transforme dados em decisões estratégicas
+                Explore o mapa de ocorrências de trânsito do Recife
               </h2>
               <p className="text-lg text-foreground/70 mb-8">
-                Nossa plataforma permite identificar padrões ocultos, otimizar
-                recursos e reduzir riscos através de visualizações geoespaciais
-                avançadas.
+                Transformamos <strong>dados oficiais da CTTU</strong> em um
+                painel interativo e inteligente, revelando padrões e pontos
+                críticos no trânsito da cidade.
               </p>
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 text-primary" />
-                  <span>Redução de até 40% nos custos operacionais</span>
+                  <span>
+                    Identifique pontos críticos e padrões de acidentes.
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 text-primary" />
-                  <span>Melhoria de 60% na precisão das análises</span>
+                  <span>
+                    Baseie suas decisões em dados oficiais e atualizados.
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 text-primary" />
-                  <span>Implementação em menos de 24 horas</span>
+                  <span>Acesse mapa de calor com filtros inteligentes.</span>
                 </div>
               </div>
 
