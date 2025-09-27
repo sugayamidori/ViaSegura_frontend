@@ -28,7 +28,7 @@ const Header = () => {
               Início
             </Link>
             <Link
-              href="/"
+              href="/api"
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
               Api

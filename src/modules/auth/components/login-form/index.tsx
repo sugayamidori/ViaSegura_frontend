@@ -105,9 +105,9 @@ export const LoginForm = () => {
 
               <FormControl>
                 <div
-                  className={`bg-muted flex 
-                          h-10 w-full items-center justify-between gap-2 
-                          text-center  
+                  className={`bg-muted border-border flex h-10 w-full items-center 
+                  justify-between gap-2 py-2 focus-within:outline-none focus-within:ring-2 
+                  focus-within:ring-offset-2 rounded-md
                           ${
                             fieldState.error
                               ? `focus-within:ring-rose-600`
@@ -119,7 +119,7 @@ export const LoginForm = () => {
                     id="password"
                     placeholder="••••••••"
                     type={showPassword ? "text" : "password"}
-                    className="bg-muted pr-10 border-none shadow-none"
+                    className="bg-muted pr-10 border-none shadow-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
                     name={field.name}
                     onChange={(value) => value && field.onChange(value)}
                     ref={field.ref}

@@ -21,6 +21,7 @@ import { Input } from "@viasegura/components/ui/input";
 import { Label } from "@viasegura/components/ui/label";
 
 import { Loader } from "@viasegura/components/loader";
+import { authRegister } from "@viasegura/service/auth";
 import { Eye, EyeOff } from "lucide-react";
 import { registerSchema } from "./schemas";
 import { registerFormInputsProps } from "./types";
@@ -62,7 +63,7 @@ export const RegisterForm = () => {
   };
   return (
     <Form {...form}>
-      <form>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="username"
@@ -128,9 +129,8 @@ export const RegisterForm = () => {
               <FormControl>
                 <div
                   className={`bg-muted border-border flex h-10 w-full items-center 
-                  justify-between gap-2 rounded-[4px] border-1 border-[#707070] 
-                  px-3 py-2 
-                  text-center focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 
+                  justify-between gap-2 py-2 focus-within:outline-none focus-within:ring-2 
+                  focus-within:ring-offset-2 rounded-md
                   ${
                     fieldState.error
                       ? `focus-within:ring-rose-600`
@@ -141,7 +141,7 @@ export const RegisterForm = () => {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    className="bg-muted pr-10 border-none shadow-none"
+                    className="bg-muted pr-10 border-none shadow-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
                     name={field.name}
                     onChange={(value) => value && field.onChange(value)}
                     ref={field.ref}
@@ -153,7 +153,7 @@ export const RegisterForm = () => {
                     <button
                       onClick={handleTogglePasswordVisibility}
                       type="button"
-                      className="focus-visible:outline-primary cursor-pointer"
+                      className="focus-visible:outline-primary cursor-pointer pr-3"
                     >
                       {showPassword ? (
                         <EyeOff className="text-gray-500" strokeWidth={1} />
