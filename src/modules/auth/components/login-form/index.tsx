@@ -47,13 +47,11 @@ export const LoginForm = () => {
       if (isSucess) {
         toast.success("Seja bem-vindo!", {
           position: "bottom-right",
-          style: { backgroundColor: "white", color: "#000", border: "none" },
         });
         router.push("/heat-map");
       } else {
         toast.error("Usuário ainda não cadastrado", {
           position: "bottom-right",
-          style: { backgroundColor: "white", color: "#000", border: "none" },
         });
       }
     } catch (error) {
@@ -62,7 +60,7 @@ export const LoginForm = () => {
   };
   return (
     <Form {...form}>
-      <form className="w-full">
+      <form className="w-full" onSubmit={form.handleSubmit(handleFormLogin)}>
         <FormField
           control={form.control}
           name="email"

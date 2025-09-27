@@ -11,7 +11,7 @@ export const authRegister = async ({
   email,
   password,
 }: registerFormInputsProps) => {
-  const registerRequestMember = {
+  const registerRequest = {
     nome: username,
     email,
     senha: password,
@@ -24,9 +24,9 @@ export const authRegister = async ({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(registerRequestMember),
+      body: JSON.stringify(registerRequest),
     },
   });
 
-  return response.status === 200;
+  return response.status === 201;
 };

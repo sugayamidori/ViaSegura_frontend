@@ -51,19 +51,17 @@ export const RegisterForm = () => {
     if (success) {
       toast.success("Usuário cadastrado com sucesso!", {
         position: "bottom-right",
-        style: { backgroundColor: "white", color: "#000", border: "none" },
       });
       return router.push("/login");
     } else {
       toast.error("Não foi possível cadastrar esse usuário", {
         position: "bottom-right",
-        style: { backgroundColor: "white", color: "#000", border: "none" },
       });
     }
   };
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="username"
