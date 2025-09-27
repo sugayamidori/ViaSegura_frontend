@@ -1,5 +1,7 @@
-import { Button } from "@viasegura/components/ui/button";
+"use client";
+
 import Link from "next/link";
+import { Button } from "@viasegura/components/ui/button";
 
 const NotFound = () => {
   return (
