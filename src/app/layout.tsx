@@ -1,4 +1,5 @@
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata, Viewport } from "next";

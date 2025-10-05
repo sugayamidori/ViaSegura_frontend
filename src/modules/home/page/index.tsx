@@ -48,6 +48,7 @@ const Home = () => {
               <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
                 <div className="text-center">
                   <Map className="h-16 w-16 text-primary mx-auto mb-4" />
+                  <p className="text-foreground/60">Preview do Mapa</p>
                 </div>
               </div>
             </div>

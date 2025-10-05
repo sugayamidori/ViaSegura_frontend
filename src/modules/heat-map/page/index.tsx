@@ -1,7 +1,7 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import Header from "@viasegura/components/header";
-import { Badge } from "@viasegura/components/ui/badge";
 import { Button } from "@viasegura/components/ui/button";
 import {
   Card,
@@ -17,15 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@viasegura/components/ui/select";
-import {
-  BarChart3,
-  Calendar,
-  Filter,
-  MapPin,
-  Search,
-  TrendingUp,
-} from "lucide-react";
-import { useState } from "react";
+import { BarChart3, Calendar, Filter, MapPin, Search } from "lucide-react";
+import { HeatmapMap } from "@viasegura/constants/heatmap";
 
 const HeatMap = () => {
   const [filtros, setFiltros] = useState({
@@ -69,18 +62,21 @@ const HeatMap = () => {
     "Último ano",
   ];
 
-  const getCorIntensidade = (intensidade: string) => {
-    switch (intensidade) {
-      case "alta":
-        return "bg-red-500/20 border-red-500/40 text-red-700";
-      case "media":
-        return "bg-yellow-500/20 border-yellow-500/40 text-yellow-700";
-      case "baixa":
-        return "bg-green-500/20 border-green-500/40 text-green-700";
-      default:
-        return "bg-muted";
-    }
+  const bairroCoordinates: { [key: string]: { lat: number; lng: number } } = {
+    Centro: { lat: -8.06315, lng: -34.8812 },
+    "Zona Sul": { lat: -8.132, lng: -34.903 },
+    "Zona Norte": { lat: -8.033, lng: -34.909 },
+    "Zona Leste": { lat: -8.025, lng: -34.885 },
+    "Zona Oeste": { lat: -8.055, lng: -34.935 },
   };
+
+  const heatmapData = useMemo(() => {
+    return dadosCalor.map((item): [number, number, number] => {
+      const coords = bairroCoordinates[item.bairro];
+      return [coords?.lat || 0, coords?.lng || 0, item.sinistros];
+    });
+  }, [dadosCalor]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -201,31 +197,12 @@ const HeatMap = () => {
                     Mapa de Calor Regional
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="relative bg-muted/30 rounded-lg p-8 min-h-[500px] flex items-center justify-center">
-                    <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-                      {dadosCalor.map((item, index) => (
-                        <div
-                          key={item.bairro}
-                          className={`
-                            p-6 rounded-lg border-2 transition-all duration-300 hover:scale-105 cursor-pointer
-                            ${getCorIntensidade(item.intensidade)}
-                          `}
-                        >
-                          <div className="text-center">
-                            <h4 className="font-semibold mb-2">
-                              {item.bairro}
-                            </h4>
-                            <div className="text-2xl font-bold mb-1">
-                              {item.sinistros}
-                            </div>
-                            <div className="text-xs opacity-80">sinistros</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
 
-                    <div className="absolute top-4 right-4">
+                <CardContent>
+                  <div className="h-[500px] w-full rounded-lg overflow-hidden relative border">
+                    <HeatmapMap data={heatmapData} />
+
+                    <div className="absolute top-4 right-4 z-[1000]">
                       <div className="bg-background/90 backdrop-blur-sm rounded-lg p-3 border">
                         <h5 className="font-semibold mb-2 text-sm">Legenda</h5>
                         <div className="space-y-1">
