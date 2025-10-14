@@ -17,10 +17,7 @@ const HeatmapMap: React.FC<HeatmapMapProps> = ({ data }) => {
       zoom={12}
       style={{ height: "100%", width: "100%" }}
     >
-      <TileLayer
-        url={process.env.NEXT_PUBLIC_MAP_TILE_URL || ""}
-        //attribution={process.env.NEXT_PUBLIC_MAP_ATTRIBUTION || ""}
-      />
+      <TileLayer url={process.env.NEXT_PUBLIC_MAP_TILE_URL || ""} />
 
       <HeatmapLayer
         points={data}
