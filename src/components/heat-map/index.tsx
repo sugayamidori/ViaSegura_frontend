@@ -16,6 +16,7 @@ const HeatmapMap: React.FC<HeatmapMapProps> = ({ data }) => {
       center={[-8.05428, -34.8813]}
       zoom={12}
       style={{ height: "100%", width: "100%" }}
+      className="z-0"
     >
       <TileLayer url={process.env.NEXT_PUBLIC_MAP_TILE_URL || ""} />
 

@@ -24,6 +24,7 @@ import {
   Map,
 } from "lucide-react";
 import { HeatmapMap } from "@viasegura/constants/heatmap";
+import { BackgroundRecife } from "@viasegura/constants/img";
 
 const Home = () => {
   const incidentData = [
@@ -176,8 +177,13 @@ const Home = () => {
 
             <div className="relative">
               <div className="bg-card border border-border rounded-lg p-8 shadow-elegant">
-                <div className="aspect-square bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
-                  <Globe className="h-24 w-24 text-primary/50" />
+                <div className="aspect-square bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg overflow-hidden">
+                  <img
+                    src={BackgroundRecife.img}
+                    alt={BackgroundRecife.title}
+                    className="w-full h-full object-cover object-[35%_center]"
+                  />
+                  <div className="absolute inset-0 bg-black/25"></div>
                 </div>
               </div>
             </div>
