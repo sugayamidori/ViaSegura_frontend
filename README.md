@@ -9,7 +9,6 @@ Bem-vindo ao **ViaSegura**!
 - [Instalação](#instalação)
 - [Configuração](#configuração)
 - [Como Usar](#como-usar)
-- [Testes](#testes)
 - [Estrutura do Projeto](#estrutura-do-projeto)
 
 ## 🌟 Visão Geral
