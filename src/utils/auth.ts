@@ -1,26 +1,46 @@
-import { setCookie, deleteCookie } from "cookies-next";
-import { COOKIE_TOKEN, COOKIE_LOGIN } from "@viasegura/constants/cookies";
-import { LoginAuthReponse, SetCookiesLoginProps } from "@viasegura/types/auth";
+import { deleteCookie, setCookie } from "cookies-next";
+import {
+  COOKIE_TOKEN,
+  COOKIE_LOGIN,
+  COOKIE_REFRESH_TOKEN,
+} from "@viasegura/constants/cookies";
+import { SetCookiesLoginProps } from "@viasegura/types/auth";
+
+interface LoginApiResponse {
+  accessToken: string;
+  refreshToken: string;
+  username: string;
+}
 
 export const setCookieLogin = async ({ response }: SetCookiesLoginProps) => {
-  const { access_token, usuario }: LoginAuthReponse = await response.json();
+  const apiData: LoginApiResponse = await response.json();
 
-  setCookie(COOKIE_TOKEN, access_token, {
+  const { accessToken, refreshToken, username } = apiData;
+
+  setCookie(COOKIE_TOKEN, accessToken, {
     path: "/",
-    maxAge: 90 * 60,
+    maxAge: 60 * 60,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
   });
 
-  setCookie(COOKIE_LOGIN, usuario, {
+  setCookie(COOKIE_REFRESH_TOKEN, refreshToken, {
     path: "/",
-    maxAge: 90 * 60,
+    maxAge: 60 * 60,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  setCookie(COOKIE_LOGIN, username, {
+    path: "/",
+    maxAge: 60 * 60,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
   });
 };
 
 export const clearToken = () => {
-  deleteCookie(COOKIE_TOKEN);
-  deleteCookie(COOKIE_LOGIN);
+  deleteCookie(COOKIE_TOKEN, { path: "/" });
+  deleteCookie(COOKIE_REFRESH_TOKEN, { path: "/" });
+  deleteCookie(COOKIE_LOGIN, { path: "/" });
 };
