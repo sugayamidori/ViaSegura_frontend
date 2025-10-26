@@ -7,12 +7,13 @@ import { MapPin, Activity, LogOut } from "lucide-react";
 import { Button } from "@viasegura/components/ui/button";
 
 import { clearToken } from "@viasegura/utils/auth";
+import { PROTECTED_ROUTES } from "@viasegura/constants/routes";
 
 const Header = () => {
   const route = useRouter();
   const pathname = usePathname();
 
-  const isHeatMapPage = pathname === "/heat-map";
+  const isProtectedRoute = PROTECTED_ROUTES.includes(pathname);
 
   const handleLogout = () => {
     clearToken();
@@ -23,7 +24,7 @@ const Header = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link
-            href={isHeatMapPage ? "#" : "/"}
+            href={isProtectedRoute ? "#" : "/"}
             className="flex items-center gap-3 group"
           >
             <div className="relative">
@@ -35,7 +36,7 @@ const Header = () => {
             </span>
           </Link>
 
-          {isHeatMapPage ? (
+          {isProtectedRoute ? (
             <Button
               variant="ghost"
               onClick={handleLogout}
@@ -54,10 +55,10 @@ const Header = () => {
                   Início
                 </Link>
                 <Link
-                  href="/api"
+                  href="/api-dashboard"
                   className="text-foreground/80 hover:text-foreground transition-colors"
                 >
-                  Api
+                  API
                 </Link>
               </nav>
 
