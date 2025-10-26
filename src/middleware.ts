@@ -10,9 +10,11 @@ export function middleware(request: NextRequest) {
     return !token || token === "undefined";
   };
 
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
-  const isProtectedRoute = pathname.startsWith(PROTECTED_ROUTES);
   const hasInvalidToken = isTokenInvalid(token);
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
+    pathname.startsWith(route)
+  );
 
   if (isProtectedRoute && hasInvalidToken) {
     const response = NextResponse.redirect(new URL("/login", request.url));
@@ -21,8 +23,12 @@ export function middleware(request: NextRequest) {
   }
 
   if (isPublicRoute && !hasInvalidToken && pathname !== "/") {
-    return NextResponse.redirect(new URL(PROTECTED_ROUTES, request.url));
+    return NextResponse.redirect(new URL(PROTECTED_ROUTES[0], request.url));
   }
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+};
