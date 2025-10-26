@@ -1,3 +1,3 @@
-import HeatMap from "@viasegura/modules/heat-map/page/index";
+import HeatMap from "@viasegura/modules/heat-map/page";
 
 export default HeatMap;

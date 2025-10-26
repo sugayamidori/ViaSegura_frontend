@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { loginSchema } from "./schemas";
 import { loginFormInputsProps } from "./types";
 import { Button } from "@viasegura/components/ui/button";
+import { authLogin } from "@viasegura/service/auth";
 
 export const LoginForm = () => {
   const router = useRouter();
@@ -31,7 +32,7 @@ export const LoginForm = () => {
   const form = useForm<loginFormInputsProps>({
     resolver: zodResolver(schema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -63,10 +64,10 @@ export const LoginForm = () => {
       <form className="w-full" onSubmit={form.handleSubmit(handleFormLogin)}>
         <FormField
           control={form.control}
-          name="email"
+          name="username"
           render={({ field, fieldState }) => (
             <FormItem>
-              <FormLabel htmlFor="email" className="mt-5">
+              <FormLabel htmlFor="username" className="mt-5">
                 E-mail
               </FormLabel>
 
@@ -74,7 +75,7 @@ export const LoginForm = () => {
                 className={fieldState.error && "focus-visible:ring-rose-600"}
               >
                 <Input
-                  id="email"
+                  id="username"
                   inputMode="email"
                   type="text"
                   placeholder="seu@email.com"

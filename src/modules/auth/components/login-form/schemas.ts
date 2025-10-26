@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const loginSchema = () => {
   const schema = z.object({
-    email: z
+    username: z
       .string()
       .trim()
       .min(1, {

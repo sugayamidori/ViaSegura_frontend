@@ -1,7 +1,7 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import Header from "@viasegura/components/header";
-import { Badge } from "@viasegura/components/ui/badge";
 import { Button } from "@viasegura/components/ui/button";
 import {
   Card,
@@ -17,25 +17,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@viasegura/components/ui/select";
-import {
-  BarChart3,
-  Calendar,
-  Filter,
-  MapPin,
-  Search,
-  TrendingUp,
-} from "lucide-react";
-import { useState } from "react";
+import { BarChart3, Calendar, Filter, MapPin, Search } from "lucide-react";
+import { HeatmapMap } from "@viasegura/constants/heatmap";
 
 const HeatMap = () => {
-  const [filtros, setFiltros] = useState({
+  const [filters, setFilters] = useState({
     bairro: "",
     periodo: "",
     tipoSinistro: "",
     pesquisa: "",
   });
 
-  const dadosCalor = [
+  const incidentData = [
     { bairro: "Centro", sinistros: 45, intensidade: "alta" },
     { bairro: "Zona Sul", sinistros: 32, intensidade: "media" },
     { bairro: "Zona Norte", sinistros: 28, intensidade: "media" },
@@ -43,7 +36,7 @@ const HeatMap = () => {
     { bairro: "Zona Oeste", sinistros: 22, intensidade: "baixa" },
   ];
 
-  const tiposSinistro = [
+  const incidentTypes = [
     "Acidente de Trânsito",
     "Roubo/Furto",
     "Incêndio",
@@ -52,7 +45,7 @@ const HeatMap = () => {
     "Todos",
   ];
 
-  const bairros = [
+  const neighborhoods = [
     "Centro",
     "Zona Sul",
     "Zona Norte",
@@ -61,7 +54,7 @@ const HeatMap = () => {
     "Todos",
   ];
 
-  const periodos = [
+  const timePeriods = [
     "Última semana",
     "Último mês",
     "Últimos 3 meses",
@@ -69,18 +62,23 @@ const HeatMap = () => {
     "Último ano",
   ];
 
-  const getCorIntensidade = (intensidade: string) => {
-    switch (intensidade) {
-      case "alta":
-        return "bg-red-500/20 border-red-500/40 text-red-700";
-      case "media":
-        return "bg-yellow-500/20 border-yellow-500/40 text-yellow-700";
-      case "baixa":
-        return "bg-green-500/20 border-green-500/40 text-green-700";
-      default:
-        return "bg-muted";
-    }
+  const neighborhoodCoordinates: {
+    [key: string]: { lat: number; lng: number };
+  } = {
+    Centro: { lat: -8.06315, lng: -34.8812 },
+    "Zona Sul": { lat: -8.132, lng: -34.903 },
+    "Zona Norte": { lat: -8.033, lng: -34.909 },
+    "Zona Leste": { lat: -8.025, lng: -34.885 },
+    "Zona Oeste": { lat: -8.055, lng: -34.935 },
   };
+
+  const heatmapData = useMemo(() => {
+    return incidentData.map((item): [number, number, number] => {
+      const coords = neighborhoodCoordinates[item.bairro];
+      return [coords?.lat || 0, coords?.lng || 0, item.sinistros];
+    });
+  }, [incidentData]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -110,25 +108,25 @@ const HeatMap = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Pesquisar localização..."
-                    value={filtros.pesquisa}
+                    value={filters.pesquisa}
                     onChange={(e) =>
-                      setFiltros({ ...filtros, pesquisa: e.target.value })
+                      setFilters({ ...filters, pesquisa: e.target.value })
                     }
                     className="pl-10"
                   />
                 </div>
 
                 <Select
-                  value={filtros.bairro}
+                  value={filters.bairro}
                   onValueChange={(value) =>
-                    setFiltros({ ...filtros, bairro: value })
+                    setFilters({ ...filters, bairro: value })
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecionar bairro" />
                   </SelectTrigger>
                   <SelectContent>
-                    {bairros.map((bairro) => (
+                    {neighborhoods.map((bairro) => (
                       <SelectItem key={bairro} value={bairro}>
                         {bairro}
                       </SelectItem>
@@ -137,16 +135,16 @@ const HeatMap = () => {
                 </Select>
 
                 <Select
-                  value={filtros.periodo}
+                  value={filters.periodo}
                   onValueChange={(value) =>
-                    setFiltros({ ...filtros, periodo: value })
+                    setFilters({ ...filters, periodo: value })
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Período" />
                   </SelectTrigger>
                   <SelectContent>
-                    {periodos.map((periodo) => (
+                    {timePeriods.map((periodo) => (
                       <SelectItem key={periodo} value={periodo}>
                         {periodo}
                       </SelectItem>
@@ -155,16 +153,16 @@ const HeatMap = () => {
                 </Select>
 
                 <Select
-                  value={filtros.tipoSinistro}
+                  value={filters.tipoSinistro}
                   onValueChange={(value) =>
-                    setFiltros({ ...filtros, tipoSinistro: value })
+                    setFilters({ ...filters, tipoSinistro: value })
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Tipo de sinistro" />
                   </SelectTrigger>
                   <SelectContent>
-                    {tiposSinistro.map((tipo) => (
+                    {incidentTypes.map((tipo) => (
                       <SelectItem key={tipo} value={tipo}>
                         {tipo}
                       </SelectItem>
@@ -177,7 +175,7 @@ const HeatMap = () => {
                 <Button
                   variant="outline"
                   onClick={() =>
-                    setFiltros({
+                    setFilters({
                       bairro: "",
                       periodo: "",
                       tipoSinistro: "",
@@ -201,31 +199,12 @@ const HeatMap = () => {
                     Mapa de Calor Regional
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="relative bg-muted/30 rounded-lg p-8 min-h-[500px] flex items-center justify-center">
-                    <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-                      {dadosCalor.map((item, index) => (
-                        <div
-                          key={item.bairro}
-                          className={`
-                            p-6 rounded-lg border-2 transition-all duration-300 hover:scale-105 cursor-pointer
-                            ${getCorIntensidade(item.intensidade)}
-                          `}
-                        >
-                          <div className="text-center">
-                            <h4 className="font-semibold mb-2">
-                              {item.bairro}
-                            </h4>
-                            <div className="text-2xl font-bold mb-1">
-                              {item.sinistros}
-                            </div>
-                            <div className="text-xs opacity-80">sinistros</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
 
-                    <div className="absolute top-4 right-4">
+                <CardContent>
+                  <div className="h-[500px] w-full rounded-lg overflow-hidden relative border">
+                    <HeatmapMap data={heatmapData} />
+
+                    <div className="absolute top-4 right-4 z-[1000]">
                       <div className="bg-background/90 backdrop-blur-sm rounded-lg p-3 border">
                         <h5 className="font-semibold mb-2 text-sm">Legenda</h5>
                         <div className="space-y-1">

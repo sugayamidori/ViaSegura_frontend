@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import Link from "next/link";
 
 import Header from "@viasegura/components/header";
@@ -21,8 +23,35 @@ import {
   ArrowRight,
   Map,
 } from "lucide-react";
+import { HeatmapMap } from "@viasegura/constants/heatmap";
+import { BackgroundRecife } from "@viasegura/constants/img";
 
 const Home = () => {
+  const incidentData = [
+    { neighborhood: "Center", incidentCount: 45, intensity: "high" },
+    { neighborhood: "South Zone", incidentCount: 32, intensity: "medium" },
+    { neighborhood: "North Zone", incidentCount: 28, intensity: "medium" },
+    { neighborhood: "East Zone", incidentCount: 18, intensity: "low" },
+    { neighborhood: "West Zone", incidentCount: 22, intensity: "low" },
+  ];
+
+  const neighborhoodCoordinates: {
+    [key: string]: { lat: number; lng: number };
+  } = {
+    Center: { lat: -8.06315, lng: -34.8812 },
+    "South Zone": { lat: -8.132, lng: -34.903 },
+    "North Zone": { lat: -8.033, lng: -34.909 },
+    "East Zone": { lat: -8.025, lng: -34.885 },
+    "West Zone": { lat: -8.055, lng: -34.935 },
+  };
+
+  const heatmapData = useMemo(() => {
+    return incidentData.map((item): [number, number, number] => {
+      const coords = neighborhoodCoordinates[item.neighborhood];
+      return [coords?.lat || 0, coords?.lng || 0, item.incidentCount];
+    });
+  }, [incidentData]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -36,7 +65,6 @@ const Home = () => {
               mapas de calor
             </span>
           </h1>
-
           <p className="text-xl text-foreground/70 mb-8 max-w-3xl mx-auto">
             Transforme dados de sinistros em insights visuais poderosos.
             Identifique padrões, previna riscos e tome decisões baseadas em
@@ -45,10 +73,8 @@ const Home = () => {
 
           <div className="relative max-w-4xl mx-auto">
             <div className="bg-card border border-border rounded-lg p-8 shadow-elegant">
-              <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <Map className="h-16 w-16 text-primary mx-auto mb-4" />
-                </div>
+              <div className="aspect-video w-full rounded-lg overflow-hidden">
+                <HeatmapMap data={heatmapData} />
               </div>
             </div>
           </div>
@@ -151,8 +177,13 @@ const Home = () => {
 
             <div className="relative">
               <div className="bg-card border border-border rounded-lg p-8 shadow-elegant">
-                <div className="aspect-square bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
-                  <Globe className="h-24 w-24 text-primary/50" />
+                <div className="aspect-square bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg overflow-hidden">
+                  <img
+                    src={BackgroundRecife.img}
+                    alt={BackgroundRecife.title}
+                    className="w-full h-full object-cover object-[35%_center]"
+                  />
+                  <div className="absolute inset-0 bg-black/25"></div>
                 </div>
               </div>
             </div>

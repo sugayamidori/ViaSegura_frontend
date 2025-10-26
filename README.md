@@ -48,6 +48,7 @@ Após a instalação, é necessário configurar as variáveis de ambiente:
     ```env
     NEXT_PUBLIC_API_URL="http://localhost:8080"
     NODE_ENV=development
+    NEXT_PUBLIC_MAP_TILE_URL="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     ```
 
     **Observação:** `NODE_ENV` geralmente é `development` para desenvolvimento local e `production` para builds de produção.
