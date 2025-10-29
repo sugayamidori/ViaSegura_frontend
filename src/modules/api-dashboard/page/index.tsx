@@ -11,7 +11,7 @@ import {
 } from "@viasegura/components/ui/card";
 import { Button } from "@viasegura/components/ui/button";
 import { Badge } from "@viasegura/components/ui/badge";
-import Header from "@viasegura/components/header";
+import { Header } from "@viasegura/components/header";
 import { Progress } from "@viasegura/components/ui/progress";
 import { Separator } from "@viasegura/components/ui/separator";
 import { Copy, Key, TrendingUp, Clock, Shield, Code } from "lucide-react";

@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import Link from "next/link";
 
-import Header from "@viasegura/components/header";
+import { Header } from "@viasegura/components/header";
 import { Button } from "@viasegura/components/ui/button";
 import {
   Card,

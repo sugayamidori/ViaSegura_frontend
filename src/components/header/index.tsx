@@ -9,7 +9,7 @@ import { Button } from "@viasegura/components/ui/button";
 import { clearToken } from "@viasegura/utils/auth";
 import { PROTECTED_ROUTES } from "@viasegura/constants/routes";
 
-const Header = () => {
+export const Header = () => {
   const route = useRouter();
   const pathname = usePathname();
 
@@ -84,5 +84,3 @@ const Header = () => {
     </header>
   );
 };
-
-export default Header;
