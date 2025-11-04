@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { MapPin, Activity, LogOut } from "lucide-react";
 import { Button } from "@viasegura/components/ui/button";
+import { ColorBlindnessToggle } from "@viasegura/components/colorBlindess";
 
 import { clearToken } from "@viasegura/utils/auth";
 import { PROTECTED_ROUTES } from "@viasegura/constants/routes";
@@ -20,7 +21,7 @@ const Header = () => {
     route.push("/login");
   };
   return (
-    <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border pr-[var(--removed-body-scroll-bar-size)]">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link
@@ -63,6 +64,7 @@ const Header = () => {
               </nav>
 
               <div className="flex items-center gap-4">
+                <ColorBlindnessToggle />
                 <Link href="/login">
                   <Button
                     variant="ghost"
