@@ -53,6 +53,10 @@
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --radius: 0.5rem;
+    --heatmap-stop1: 240 70% 60%;
+    --heatmap-stop2: 120 70% 50%;
+    --heatmap-stop3: 60 100% 50%;
+    --heatmap-stop4: 0 100% 50%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -92,6 +96,10 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    --heatmap-stop1: 217 30% 20%;
+    --heatmap-stop2: 180 40% 40%;
+    --heatmap-stop3: 210 40% 80%;
+    --heatmap-stop4: 210 40% 98%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -148,6 +156,10 @@
       hsl(40 95% 45%)
     );
     --shadow-glow: 0 0 40px hsl(200 100% 50% / 0.3);
+    --heatmap-stop1: 220 90% 60%;
+    --heatmap-stop2: 200 100% 50%;
+    --heatmap-stop3: 60 100% 50%;
+    --heatmap-stop4: 45 100% 50%;
   }
 
   .colorblind-tritan {
@@ -196,6 +208,10 @@
       hsl(160 75% 35%)
     );
     --shadow-glow: 0 0 40px hsl(340 85% 55% / 0.3);
+    --heatmap-stop1: 160 75% 45%;
+    --heatmap-stop2: 180 60% 50%;
+    --heatmap-stop3: 340 85% 55%;
+    --heatmap-stop4: 15 85% 55%;
   }
 
   .colorblind-achrom {
@@ -236,6 +252,10 @@
     );
     --gradient-accent: linear-gradient(135deg, hsl(0 0% 75%), hsl(0 0% 60%));
     --shadow-glow: 0 0 40px hsl(0 0% 50% / 0.4);
+    --heatmap-stop1: 0 0% 20%;
+    --heatmap-stop2: 0 0% 40%;
+    --heatmap-stop3: 0 0% 70%;
+    --heatmap-stop4: 0 0% 95%;
   }
 
   * {
@@ -245,9 +265,6 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
-  /* html {
-    overflow-y: scroll;
-  } */
 }
 
 .leaflet-control-attribution a[href="https://leafletjs.com"]
