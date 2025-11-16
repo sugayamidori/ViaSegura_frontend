@@ -43,6 +43,10 @@ jest.mock("@viasegura/components/ui/button", () => ({
   ),
 }));
 
+jest.mock("@viasegura/components/colorBlindness", () => ({
+  ColorBlindnessToggle: () => <div data-testid="color-toggle-mock" />,
+}));
+
 describe("Header Component", () => {
   beforeEach(() => {
     mockPush.mockClear();

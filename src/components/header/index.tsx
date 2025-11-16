@@ -5,7 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { MapPin, Activity, LogOut } from "lucide-react";
 import { Button } from "@viasegura/components/ui/button";
-import { ColorBlindnessToggle } from "@viasegura/components/colorBlindess";
+
+import { ColorBlindnessToggle } from "@viasegura/components/colorBlindness";
 
 import { clearToken } from "@viasegura/utils/auth";
 import { PROTECTED_ROUTES } from "@viasegura/constants/routes";
