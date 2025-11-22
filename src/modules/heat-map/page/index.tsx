@@ -267,10 +267,6 @@ const HeatMap = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button variant="outline" className="w-full justify-start">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Gerar Relatório
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
                     <MapPin className="h-4 w-4 mr-2" />
                     Exportar Dados
                   </Button>
