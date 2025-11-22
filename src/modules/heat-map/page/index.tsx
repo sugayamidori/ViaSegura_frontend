@@ -103,7 +103,7 @@ const HeatMap = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -151,27 +151,9 @@ const HeatMap = () => {
                     ))}
                   </SelectContent>
                 </Select>
-
-                <Select
-                  value={filters.tipoSinistro}
-                  onValueChange={(value) =>
-                    setFilters({ ...filters, tipoSinistro: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Tipo de sinistro" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {incidentTypes.map((tipo) => (
-                      <SelectItem key={tipo} value={tipo}>
-                        {tipo}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 justify-end">
                 <Button
                   variant="outline"
                   onClick={() =>
