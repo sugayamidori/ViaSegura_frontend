@@ -39,14 +39,17 @@ export const Header = () => {
           </Link>
 
           {isProtectedRoute ? (
-            <Button
-              variant="ghost"
-              onClick={handleLogout}
-              className="flex items-center gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Sair
-            </Button>
+            <div className="flex gap-8">
+              <ColorBlindnessToggle />
+              <Button
+                variant="ghost"
+                onClick={handleLogout}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sair
+              </Button>
+            </div>
           ) : (
             <>
               <nav className="hidden md:flex items-center gap-8">
