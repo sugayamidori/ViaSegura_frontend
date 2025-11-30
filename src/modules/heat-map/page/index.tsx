@@ -1,15 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
+import { BarChart3, Filter, MapPin, Search, Loader2 } from "lucide-react";
+
 import { Header } from "@viasegura/components/header";
 import { Button } from "@viasegura/components/ui/button";
+import { Input } from "@viasegura/components/ui/input";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@viasegura/components/ui/card";
-import { Input } from "@viasegura/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -17,67 +19,96 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@viasegura/components/ui/select";
-import { BarChart3, Calendar, Filter, MapPin, Search } from "lucide-react";
+
 import { HeatmapMap } from "@viasegura/constants/heatmap";
+import { heatmap } from "@viasegura/service/heatmap";
+import { HeatmapResponse } from "@viasegura/types/heatmap";
+
+const NEIGHBORHOODS = [
+  "All",
+  "Nova Descoberta",
+  "Mangueira",
+  "Boa Viagem",
+  "Cajueiro",
+  "Centro",
+];
+
+const TIME_PERIODS = [
+  "Last week",
+  "Last month",
+  "Last 3 months",
+  "Last 6 months",
+  "Last year",
+];
 
 const HeatMap = () => {
+  const [apiData, setApiData] = useState<HeatmapResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const totalIncidents = apiData?.totalElements || 0;
+
   const [filters, setFilters] = useState({
-    bairro: "",
-    periodo: "",
-    tipoSinistro: "",
-    pesquisa: "",
+    neighborhood: "",
+    period: "",
+    search: "",
   });
 
-  const incidentData = [
-    { bairro: "Centro", sinistros: 45, intensidade: "alta" },
-    { bairro: "Zona Sul", sinistros: 32, intensidade: "media" },
-    { bairro: "Zona Norte", sinistros: 28, intensidade: "media" },
-    { bairro: "Zona Leste", sinistros: 18, intensidade: "baixa" },
-    { bairro: "Zona Oeste", sinistros: 22, intensidade: "baixa" },
-  ];
-
-  const incidentTypes = [
-    "Acidente de Trânsito",
-    "Roubo/Furto",
-    "Incêndio",
-    "Vandalismo",
-    "Colisão",
-    "Todos",
-  ];
-
-  const neighborhoods = [
-    "Centro",
-    "Zona Sul",
-    "Zona Norte",
-    "Zona Leste",
-    "Zona Oeste",
-    "Todos",
-  ];
-
-  const timePeriods = [
-    "Última semana",
-    "Último mês",
-    "Últimos 3 meses",
-    "Últimos 6 meses",
-    "Último ano",
-  ];
-
-  const neighborhoodCoordinates: {
-    [key: string]: { lat: number; lng: number };
-  } = {
-    Centro: { lat: -8.06315, lng: -34.8812 },
-    "Zona Sul": { lat: -8.132, lng: -34.903 },
-    "Zona Norte": { lat: -8.033, lng: -34.909 },
-    "Zona Leste": { lat: -8.025, lng: -34.885 },
-    "Zona Oeste": { lat: -8.055, lng: -34.935 },
-  };
+  const fetchHeatmapData = useCallback(async () => {
+    setIsLoading(false);
+    try {
+      const response = await heatmap();
+      setApiData(response);
+    } catch (error) {
+      console.error("Error loading heatmap:", error);
+      setIsLoading(true);
+    }
+  }, [filters.neighborhood]);
 
   const heatmapData = useMemo(() => {
-    return incidentData.map((item): [number, number, number] => {
-      const coords = neighborhoodCoordinates[item.bairro];
-      return [coords?.lat || 0, coords?.lng || 0, item.sinistros];
+    if (!apiData?.content) return [];
+
+    return apiData.content
+      .map((item) => {
+        const lat = Number(item.latitude);
+        const lng = Number(item.longitude);
+
+        if (isNaN(lat) || isNaN(lng)) return null;
+
+        return [lat, lng, 1] as [number, number, number];
+      })
+      .filter((item): item is [number, number, number] => item !== null);
+  }, [apiData]);
+
+  const topNeighborhood = useMemo(() => {
+    if (!apiData?.content || apiData.content.length === 0) return "-";
+
+    const counts: Record<string, number> = {};
+    let maxCount = 0;
+    let topName = "-";
+
+    apiData.content.forEach((item) => {
+      const name = item.neighborhood;
+      counts[name] = (counts[name] || 0) + 1;
+      if (counts[name] > maxCount) {
+        maxCount = counts[name];
+        topName = name;
+      }
     });
-  }, [incidentData]);
+
+    return topName
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }, [apiData]);
+
+  const affectedRegionsCount = useMemo(() => {
+    if (!apiData?.content) return 0;
+    return new Set(apiData.content.map((i) => i.neighborhood)).size;
+  }, [apiData]);
+
+  useEffect(() => {
+    fetchHeatmapData();
+  }, [fetchHeatmapData]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -108,45 +139,48 @@ const HeatMap = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Pesquisar localização..."
-                    value={filters.pesquisa}
+                    value={filters.search}
                     onChange={(e) =>
-                      setFilters({ ...filters, pesquisa: e.target.value })
+                      setFilters((prev) => ({
+                        ...prev,
+                        search: e.target.value,
+                      }))
                     }
                     className="pl-10"
                   />
                 </div>
 
                 <Select
-                  value={filters.bairro}
+                  value={filters.neighborhood}
                   onValueChange={(value) =>
-                    setFilters({ ...filters, bairro: value })
+                    setFilters((prev) => ({ ...prev, neighborhood: value }))
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecionar bairro" />
                   </SelectTrigger>
                   <SelectContent>
-                    {neighborhoods.map((bairro) => (
-                      <SelectItem key={bairro} value={bairro}>
-                        {bairro}
+                    {NEIGHBORHOODS.map((neighborhood) => (
+                      <SelectItem key={neighborhood} value={neighborhood}>
+                        {neighborhood}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
 
                 <Select
-                  value={filters.periodo}
+                  value={filters.period}
                   onValueChange={(value) =>
-                    setFilters({ ...filters, periodo: value })
+                    setFilters((prev) => ({ ...prev, period: value }))
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Período" />
                   </SelectTrigger>
                   <SelectContent>
-                    {timePeriods.map((periodo) => (
-                      <SelectItem key={periodo} value={periodo}>
-                        {periodo}
+                    {TIME_PERIODS.map((period) => (
+                      <SelectItem key={period} value={period}>
+                        {period}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -158,16 +192,28 @@ const HeatMap = () => {
                   variant="outline"
                   onClick={() =>
                     setFilters({
-                      bairro: "",
-                      periodo: "",
-                      tipoSinistro: "",
-                      pesquisa: "",
+                      neighborhood: "",
+                      period: "",
+                      search: "",
                     })
                   }
                 >
                   Limpar Filtros
                 </Button>
-                <Button className="bg-gradient-primary">Aplicar Filtros</Button>
+                <Button
+                  className="bg-gradient-primary"
+                  onClick={fetchHeatmapData}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Loading
+                    </>
+                  ) : (
+                    "Aplicar Filtros"
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -183,28 +229,25 @@ const HeatMap = () => {
                 </CardHeader>
 
                 <CardContent>
-                  <div className="h-[500px] w-full rounded-lg overflow-hidden relative border">
-                    <HeatmapMap data={heatmapData} />
-
-                    <div className="absolute top-4 right-4 z-[1000]">
-                      <div className="bg-background/90 backdrop-blur-sm rounded-lg p-3 border">
-                        <h5 className="font-semibold mb-2 text-sm">Legenda</h5>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-xs">
-                            <div className="w-3 h-3 rounded bg-red-500/40"></div>
-                            <span>Alta incidência</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-xs">
-                            <div className="w-3 h-3 rounded bg-yellow-500/40"></div>
-                            <span>Média incidência</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-xs">
-                            <div className="w-3 h-3 rounded bg-green-500/40"></div>
-                            <span>Baixa incidência</span>
-                          </div>
-                        </div>
+                  <div className="h-[500px] w-full rounded-lg overflow-hidden relative border bg-muted/10">
+                    {isLoading && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm z-50">
+                        <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
+                        <span className="text-sm text-muted-foreground">
+                          Carregando os dados geográficos
+                        </span>
                       </div>
-                    </div>
+                    )}
+
+                    {!isLoading && <HeatmapMap data={heatmapData} />}
+
+                    {!isLoading && heatmapData.length === 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <span className="bg-background/80 px-4 py-2 rounded text-muted-foreground text-sm">
+                          Sem dados encontrado para essa região
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -220,23 +263,30 @@ const HeatMap = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="text-center p-4 bg-muted/30 rounded-lg">
-                    <div className="text-3xl font-bold text-primary">145</div>
+                    <div className="text-3xl font-bold text-primary">
+                      {isLoading ? "-" : totalIncidents}
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       Total de Sinistros
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg">
-                      <div className="text-xl font-semibold">5</div>
-                      <div className="text-xs text-muted-foreground">
-                        Regiões
+                    <div className="text-center p-3 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/10">
+                      <div className="text-xl font-semibold text-foreground">
+                        {isLoading ? "-" : affectedRegionsCount}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-medium">
+                        Bairros Afetados
                       </div>
                     </div>
-                    <div className="text-center p-3 bg-gradient-to-br from-accent/10 to-accent/5 rounded-lg">
-                      <div className="text-xl font-semibold">89%</div>
-                      <div className="text-xs text-muted-foreground">
-                        Precisão
+
+                    <div className="text-center p-3 bg-gradient-to-br from-destructive/10 to-destructive/5 rounded-lg border border-destructive/10">
+                      <div className="text-xl font-semibold text-foreground truncate px-1">
+                        {isLoading ? "-" : topNeighborhood}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-medium">
+                        Maior Incidência
                       </div>
                     </div>
                   </div>
@@ -245,12 +295,12 @@ const HeatMap = () => {
 
               <Card className="shadow-soft">
                 <CardHeader>
-                  <CardTitle>Ações Rápidas</CardTitle>
+                  <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button variant="outline" className="w-full justify-start">
                     <MapPin className="h-4 w-4 mr-2" />
-                    Exportar Dados
+                    Exportar dados
                   </Button>
                 </CardContent>
               </Card>
