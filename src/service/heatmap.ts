@@ -11,21 +11,20 @@ import {
   EMPTY_RESPONSE,
   HEATMAP_ENDPOINTS,
 } from "@viasegura/constants/heatmap";
-import { buildExportQueryParams } from "@viasegura/utils/heatmap-params";
+import {
+  buildExportQueryParams,
+  buildHeatmapQueryParams,
+} from "@viasegura/utils/heatmap-params";
 
 let token = getCookie(COOKIE_TOKEN);
 
 export const heatmap = async (
   params?: HeatmapParams
 ): Promise<HeatmapResponse> => {
-  const searchParams = new URLSearchParams();
-
-  if (params?.neighborhood && params.neighborhood !== "All") {
-    searchParams.set("neighborhood", params.neighborhood);
-  }
-
-  const queryString = searchParams.toString();
-  const url = queryString ? `h3_grid?${queryString}` : "h3_grid?";
+  const queryString = buildHeatmapQueryParams(params);
+  const url = queryString
+    ? `${HEATMAP_ENDPOINTS.GET}?${queryString}`
+    : HEATMAP_ENDPOINTS.GET;
 
   const response = await fetchAPI({
     url: url,
@@ -38,9 +37,9 @@ export const heatmap = async (
     },
   });
 
-  if (!response.ok) return EMPTY_RESPONSE;
+  if (!response.ok) return EMPTY_RESPONSE as HeatmapResponse;
 
-  return response.json().catch(() => EMPTY_RESPONSE);
+  return response.json().catch(() => EMPTY_RESPONSE as HeatmapResponse);
 };
 
 export const neighborhood = async () => {
