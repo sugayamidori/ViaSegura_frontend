@@ -141,11 +141,11 @@ describe("ColorBlindnessToggle Component", () => {
     expect(mockClassListAdd).toHaveBeenCalledWith("colorblind-tritan");
     mockClassListAdd.mockClear();
 
-    const normalItem = screen.getByText("Normal");
+    const normalItem = screen.getByText("Clássico");
     fireEvent.click(normalItem);
 
     expect(screen.queryByTestId("palette-icon")).not.toBeInTheDocument();
-    expect(setItemSpy).toHaveBeenCalledWith("colorblind-mode", "normal");
+    expect(setItemSpy).toHaveBeenCalledWith("colorblind-mode", "classico");
     expect(mockClassListRemove).toHaveBeenCalledWith("colorblind-tritan");
     expect(mockClassListAdd).not.toHaveBeenCalled();
   });
