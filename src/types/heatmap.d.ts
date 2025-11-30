@@ -25,3 +25,12 @@ export interface HeatmapParams {
   longitude?: number;
   neighborhood?: string;
 }
+
+export interface ExportHeatmapParams {
+  start_year?: number;
+  start_month?: number;
+  end_year?: number;
+  end_month?: number;
+  num_casualties?: number;
+  neighborhood?: string;
+}

@@ -2,8 +2,16 @@ import { fetchAPI } from ".";
 import { getCookie } from "cookies-next";
 import { COOKIE_TOKEN } from "@viasegura/constants/cookies";
 
-import { HeatmapParams, HeatmapResponse } from "@viasegura/types/heatmap";
-import { EMPTY_RESPONSE } from "@viasegura/constants/heatmap";
+import {
+  ExportHeatmapParams,
+  HeatmapParams,
+  HeatmapResponse,
+} from "@viasegura/types/heatmap";
+import {
+  EMPTY_RESPONSE,
+  HEATMAP_ENDPOINTS,
+} from "@viasegura/constants/heatmap";
+import { buildExportQueryParams } from "@viasegura/utils/heatmap-params";
 
 let token = getCookie(COOKIE_TOKEN);
 
@@ -38,6 +46,24 @@ export const heatmap = async (
 export const neighborhood = async () => {
   const response = await fetchAPI({
     url: `h3_grid/neighborhoods`,
+    options: {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  });
+
+  return response.json();
+};
+
+export const exportHeatmapData = async (params?: ExportHeatmapParams) => {
+  const queryString = buildExportQueryParams(params);
+  const url = `${HEATMAP_ENDPOINTS.EXPORT}?${queryString}`;
+
+  const response = await fetchAPI({
+    url: url,
     options: {
       method: "GET",
       headers: {

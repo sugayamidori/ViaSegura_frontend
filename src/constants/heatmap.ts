@@ -18,3 +18,13 @@ export const EMPTY_RESPONSE: HeatmapResponse = {
   last: true,
   empty: true,
 };
+
+export const HEATMAP_DEFAULTS = {
+  START_YEAR: 2015,
+  END_YEAR: 2024,
+  IGNORED_NEIGHBORHOOD: "All",
+};
+
+export const HEATMAP_ENDPOINTS = {
+  EXPORT: "heatmap/export",
+};

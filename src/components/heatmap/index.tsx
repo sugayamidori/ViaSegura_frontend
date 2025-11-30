@@ -81,7 +81,7 @@ const HeatmapMap: React.FC<HeatmapMapProps> = ({ data }) => {
         blur={20}
         maxZoom={13}
         minOpacity={0.4}
-        max={0.9}
+        max={1}
         gradient={gradient}
         key={mapRerenderKey}
       />
