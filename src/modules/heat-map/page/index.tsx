@@ -1,18 +1,10 @@
 "use client";
 
 import { useMemo, useState, useEffect, useCallback } from "react";
-import {
-  BarChart3,
-  Filter,
-  MapPin,
-  Search,
-  Loader2,
-  RefreshCw,
-} from "lucide-react";
+import { BarChart3, Filter, MapPin, Loader2, RefreshCw } from "lucide-react";
 
 import { Header } from "@viasegura/components/header";
 import { Button } from "@viasegura/components/ui/button";
-import { Input } from "@viasegura/components/ui/input";
 import {
   Card,
   CardContent,
@@ -29,7 +21,7 @@ import {
 
 import { HeatmapMap } from "@viasegura/constants/heatmap";
 import { heatmap, neighborhood } from "@viasegura/service/heatmap";
-import { HeatmapResponse } from "@viasegura/types/heatmap";
+import { HeatmapParams, HeatmapResponse } from "@viasegura/types/heatmap";
 
 const TIME_PERIODS = [
   "Last week",
@@ -41,9 +33,7 @@ const TIME_PERIODS = [
 
 const HeatMap = () => {
   const [apiData, setApiData] = useState<HeatmapResponse | null>(null);
-
   const [neighborhoodsList, setNeighborhoodsList] = useState<string[]>(["All"]);
-
   const [isLoading, setIsLoading] = useState(true);
   const totalIncidents = apiData?.totalElements || 0;
 
@@ -53,18 +43,41 @@ const HeatMap = () => {
     search: "",
   });
 
-  const fetchHeatmapData = useCallback(async () => {
-    setIsLoading(true);
+  const handleClearFilters = () => {
+    setFilters({
+      neighborhood: "",
+      period: "",
+      search: "",
+    });
 
-    try {
-      const response = await heatmap();
-      setApiData(response);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error loading heatmap:", error);
-      setIsLoading(false);
-    }
-  }, [filters.neighborhood]);
+    fetchHeatmapData("");
+  };
+
+  const fetchHeatmapData = useCallback(
+    async (forceNeighborhood?: string) => {
+      setIsLoading(true);
+
+      try {
+        const neighborhoodValue =
+          typeof forceNeighborhood === "string"
+            ? forceNeighborhood
+            : filters.neighborhood;
+
+        const requestParams: HeatmapParams = {
+          neighborhood: neighborhoodValue,
+        };
+
+        const response = await heatmap(requestParams);
+
+        setApiData(response);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error loading heatmap:", error);
+        setIsLoading(false);
+      }
+    },
+    [filters]
+  );
 
   const fetchNeighborhoodsList = useCallback(async () => {
     try {
@@ -123,7 +136,7 @@ const HeatMap = () => {
 
   useEffect(() => {
     fetchHeatmapData();
-  }, [fetchHeatmapData]);
+  }, []);
 
   useEffect(() => {
     fetchNeighborhoodsList();
@@ -154,21 +167,6 @@ const HeatMap = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Pesquisar localização..."
-                    value={filters.search}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        search: e.target.value,
-                      }))
-                    }
-                    className="pl-10"
-                  />
-                </div>
-
                 <Select
                   value={filters.neighborhood}
                   onValueChange={(value) =>
@@ -183,6 +181,7 @@ const HeatMap = () => {
                       <SelectItem
                         key={neighborhoodName}
                         value={neighborhoodName}
+                        className="cursor-pointer"
                       >
                         {neighborhoodName}
                       </SelectItem>
@@ -201,41 +200,35 @@ const HeatMap = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {TIME_PERIODS.map((period) => (
-                      <SelectItem key={period} value={period}>
+                      <SelectItem
+                        key={period}
+                        value={period}
+                        className="cursor-pointer"
+                      >
                         {period}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="flex gap-2 justify-end">
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    setFilters({
-                      neighborhood: "",
-                      period: "",
-                      search: "",
-                    })
-                  }
-                >
-                  Limpar Filtros
-                </Button>
-                <Button
-                  className="bg-gradient-primary"
-                  onClick={fetchHeatmapData}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Loading
-                    </>
-                  ) : (
-                    "Aplicar Filtros"
-                  )}
-                </Button>
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={handleClearFilters}>
+                    Limpar Filtros
+                  </Button>
+                  <Button
+                    className="bg-gradient-primary"
+                    onClick={() => fetchHeatmapData()}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin cursor-pointer" />
+                        Loading
+                      </>
+                    ) : (
+                      "Aplicar Filtros"
+                    )}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -253,7 +246,7 @@ const HeatMap = () => {
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 transition-all hover:bg-muted"
-                    onClick={fetchHeatmapData}
+                    onClick={() => fetchHeatmapData()}
                     disabled={isLoading}
                     title="Recarregar dados"
                   >

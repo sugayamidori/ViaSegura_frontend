@@ -2,15 +2,25 @@ import { fetchAPI } from ".";
 import { getCookie } from "cookies-next";
 import { COOKIE_TOKEN } from "@viasegura/constants/cookies";
 
-import { HeatmapResponse } from "@viasegura/types/heatmap";
-import { queryParams } from "@viasegura/constants/heatmap";
+import { HeatmapParams, HeatmapResponse } from "@viasegura/types/heatmap";
 import { EMPTY_RESPONSE } from "@viasegura/constants/heatmap";
 
 let token = getCookie(COOKIE_TOKEN);
 
-export const heatmap = async (): Promise<HeatmapResponse> => {
+export const heatmap = async (
+  params?: HeatmapParams
+): Promise<HeatmapResponse> => {
+  const searchParams = new URLSearchParams();
+
+  if (params?.neighborhood && params.neighborhood !== "All") {
+    searchParams.set("neighborhood", params.neighborhood);
+  }
+
+  const queryString = searchParams.toString();
+  const url = queryString ? `h3_grid?${queryString}` : "h3_grid?";
+
   const response = await fetchAPI({
-    url: `h3_grid?${queryParams.toString()}`,
+    url: url,
     options: {
       method: "GET",
       headers: {

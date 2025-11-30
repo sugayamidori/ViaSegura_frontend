@@ -8,8 +8,6 @@ export const HeatmapMap = dynamic(
   }
 );
 
-export const queryParams = new URLSearchParams();
-
 export const EMPTY_RESPONSE: HeatmapResponse = {
   content: [],
   totalElements: 0,
