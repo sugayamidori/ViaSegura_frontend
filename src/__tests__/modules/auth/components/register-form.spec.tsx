@@ -55,7 +55,7 @@ describe("RegisterForm Component", () => {
     expect(screen.getByLabelText("Nome")).toBeInTheDocument();
     expect(screen.getByLabelText("E-mail")).toBeInTheDocument();
     expect(screen.getByLabelText("Senha")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Entrar" })).toBeInTheDocument(); // The button text is "Entrar" in the code, though it should probably be "Cadastrar"
+    expect(screen.getByRole("button", { name: "Entrar" })).toBeInTheDocument();
     expect(screen.getByText("Já tem uma conta?")).toBeInTheDocument();
   });
 
