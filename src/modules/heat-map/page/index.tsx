@@ -28,17 +28,8 @@ import {
 } from "@viasegura/components/ui/select";
 
 import { HeatmapMap } from "@viasegura/constants/heatmap";
-import { heatmap } from "@viasegura/service/heatmap";
+import { heatmap, neighborhood } from "@viasegura/service/heatmap";
 import { HeatmapResponse } from "@viasegura/types/heatmap";
-
-const NEIGHBORHOODS = [
-  "All",
-  "Nova Descoberta",
-  "Mangueira",
-  "Boa Viagem",
-  "Cajueiro",
-  "Centro",
-];
 
 const TIME_PERIODS = [
   "Last week",
@@ -50,6 +41,9 @@ const TIME_PERIODS = [
 
 const HeatMap = () => {
   const [apiData, setApiData] = useState<HeatmapResponse | null>(null);
+
+  const [neighborhoodsList, setNeighborhoodsList] = useState<string[]>(["All"]);
+
   const [isLoading, setIsLoading] = useState(true);
   const totalIncidents = apiData?.totalElements || 0;
 
@@ -71,6 +65,18 @@ const HeatMap = () => {
       setIsLoading(false);
     }
   }, [filters.neighborhood]);
+
+  const fetchNeighborhoodsList = useCallback(async () => {
+    try {
+      const data = await neighborhood();
+
+      if (Array.isArray(data)) {
+        setNeighborhoodsList(["All", ...data]);
+      }
+    } catch (error) {
+      console.error("Error loading neighborhoods list:", error);
+    }
+  }, []);
 
   const heatmapData = useMemo(() => {
     if (!apiData?.content) return [];
@@ -118,6 +124,10 @@ const HeatMap = () => {
   useEffect(() => {
     fetchHeatmapData();
   }, [fetchHeatmapData]);
+
+  useEffect(() => {
+    fetchNeighborhoodsList();
+  }, [fetchNeighborhoodsList]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -169,9 +179,12 @@ const HeatMap = () => {
                     <SelectValue placeholder="Selecionar bairro" />
                   </SelectTrigger>
                   <SelectContent>
-                    {NEIGHBORHOODS.map((neighborhood) => (
-                      <SelectItem key={neighborhood} value={neighborhood}>
-                        {neighborhood}
+                    {neighborhoodsList.map((neighborhoodName) => (
+                      <SelectItem
+                        key={neighborhoodName}
+                        value={neighborhoodName}
+                      >
+                        {neighborhoodName}
                       </SelectItem>
                     ))}
                   </SelectContent>
