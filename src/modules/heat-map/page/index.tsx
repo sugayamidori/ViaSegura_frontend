@@ -1,7 +1,14 @@
 "use client";
 
 import { useMemo, useState, useEffect, useCallback } from "react";
-import { BarChart3, Filter, MapPin, Search, Loader2 } from "lucide-react";
+import {
+  BarChart3,
+  Filter,
+  MapPin,
+  Search,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
 
 import { Header } from "@viasegura/components/header";
 import { Button } from "@viasegura/components/ui/button";
@@ -53,13 +60,15 @@ const HeatMap = () => {
   });
 
   const fetchHeatmapData = useCallback(async () => {
-    setIsLoading(false);
+    setIsLoading(true);
+
     try {
       const response = await heatmap();
       setApiData(response);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error loading heatmap:", error);
-      setIsLoading(true);
+      setIsLoading(false);
     }
   }, [filters.neighborhood]);
 
@@ -221,21 +230,50 @@ const HeatMap = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <Card className="shadow-soft">
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                   <CardTitle className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
                     Mapa de Calor Regional
                   </CardTitle>
+
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 transition-all hover:bg-muted"
+                    onClick={fetchHeatmapData}
+                    disabled={isLoading}
+                    title="Recarregar dados"
+                  >
+                    <RefreshCw
+                      className={`h-4 w-4 ${
+                        isLoading
+                          ? "animate-spin text-primary"
+                          : "text-muted-foreground"
+                      }`}
+                    />
+                  </Button>
                 </CardHeader>
 
                 <CardContent>
-                  <div className="h-[500px] w-full rounded-lg overflow-hidden relative border bg-muted/10">
+                  <div className="h-[500px] w-full rounded-lg overflow-hidden relative border bg-muted/10 group">
                     {isLoading && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm z-50">
-                        <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
-                        <span className="text-sm text-muted-foreground">
-                          Carregando os dados geográficos
-                        </span>
+                      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/60 backdrop-blur-sm transition-all duration-300">
+                        <div className="relative flex items-center justify-center mb-4">
+                          <div className="absolute h-24 w-24 animate-ping rounded-full bg-primary/20 opacity-75 duration-1000" />
+                          <div className="absolute h-16 w-16 rounded-full bg-primary/10 animate-pulse" />
+                          <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-primary shadow-lg shadow-primary/30">
+                            <Loader2 className="h-6 w-6 text-primary-foreground animate-spin" />
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-sm font-semibold text-foreground tracking-tight">
+                            Atualizando mapa de calor
+                          </span>
+                          <span className="text-xs text-muted-foreground animate-pulse">
+                            Sincronizando dados geográficos...
+                          </span>
+                        </div>
                       </div>
                     )}
 
@@ -243,9 +281,12 @@ const HeatMap = () => {
 
                     {!isLoading && heatmapData.length === 0 && (
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <span className="bg-background/80 px-4 py-2 rounded text-muted-foreground text-sm">
-                          Sem dados encontrado para essa região
-                        </span>
+                        <div className="bg-background/90 backdrop-blur px-6 py-4 rounded-full shadow-lg border border-border flex items-center gap-2">
+                          <MapPin className="h-5 w-5 text-muted-foreground" />
+                          <span className="text-muted-foreground text-sm font-medium">
+                            Nenhum sinistro encontrado nesta região
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
