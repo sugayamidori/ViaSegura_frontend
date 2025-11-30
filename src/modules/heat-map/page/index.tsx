@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@viasegura/components/ui/card";
+import { PulseLoader } from "@viasegura/components/loader";
 import {
   Select,
   SelectContent,
@@ -264,13 +265,7 @@ const HeatMap = () => {
                   <div className="h-[500px] w-full rounded-lg overflow-hidden relative border bg-muted/10 group">
                     {isLoading && (
                       <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/60 backdrop-blur-sm transition-all duration-300">
-                        <div className="relative flex items-center justify-center mb-4">
-                          <div className="absolute h-24 w-24 animate-ping rounded-full bg-primary/20 opacity-75 duration-1000" />
-                          <div className="absolute h-16 w-16 rounded-full bg-primary/10 animate-pulse" />
-                          <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-primary shadow-lg shadow-primary/30">
-                            <Loader2 className="h-6 w-6 text-primary-foreground animate-spin" />
-                          </div>
-                        </div>
+                        <PulseLoader />
 
                         <div className="flex flex-col items-center gap-1">
                           <span className="text-sm font-semibold text-foreground tracking-tight">
