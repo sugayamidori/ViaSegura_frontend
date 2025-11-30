@@ -17,6 +17,7 @@ import { Separator } from "@viasegura/components/ui/separator";
 import { Copy, Key, TrendingUp, Clock, Shield, Code } from "lucide-react";
 
 import { toast } from "sonner";
+import { PrimarySpinner } from "@viasegura/components/loader";
 
 const ApiDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -60,11 +61,7 @@ const ApiDashboard = () => {
   const isNearLimit = progressPercentage >= 80;
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <PrimarySpinner />;
   }
 
   return (
