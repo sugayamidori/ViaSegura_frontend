@@ -19,7 +19,7 @@ jest.mock("@viasegura/utils/auth", () => ({
 }));
 
 jest.mock("@viasegura/constants/routes", () => ({
-  PROTECTED_ROUTES: ["/heat-map", "api-dashboard"],
+  PROTECTED_ROUTES: ["/heatmap", "api-dashboard"],
 }));
 
 jest.mock("lucide-react", () => ({
@@ -71,7 +71,7 @@ describe("Header Component", () => {
   });
 
   test("should render logout button when on a protected route", () => {
-    mockUsePathname.mockReturnValue("/heat-map");
+    mockUsePathname.mockReturnValue("/heatmap");
     render(<Header />);
 
     expect(screen.getByText("ViaSegura").closest("a")).toHaveAttribute(
@@ -86,7 +86,7 @@ describe("Header Component", () => {
   });
 
   test("should call clearToken and push to /login on logout", () => {
-    mockUsePathname.mockReturnValue("/heat-map");
+    mockUsePathname.mockReturnValue("/heatmap");
     render(<Header />);
 
     const logoutButton = screen.getByText("Sair");

@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { HeatmapResponse } from "@viasegura/types/heatmap";
 
 export const HeatmapMap = dynamic(
-  () => import("@viasegura/components/heat-map"),
+  () => import("@viasegura/components/heatmap"),
   {
     ssr: false,
   }
