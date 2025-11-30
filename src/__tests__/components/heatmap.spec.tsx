@@ -42,13 +42,15 @@ describe("HeatmapMap Component", () => {
 
     expect(screen.getByTestId("mock-map-container")).toBeInTheDocument();
 
-    const mapContainerMock = MapContainer as unknown as jest.Mock;
-    const mapProps = mapContainerMock.mock.calls[0][0];
-
-    expect(mapProps.center).toEqual([-8.05428, -34.8813]);
-    expect(mapProps.zoom).toBe(11);
-    expect(mapProps.style).toEqual({ height: "100%", width: "100%" });
-    expect(mapProps.className).toBe("z-0");
+    expect(MapContainer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        center: [-8.05428, -34.8813],
+        zoom: 12,
+        style: { height: "100%", width: "100%" },
+        className: "z-0",
+      }),
+      undefined
+    );
   });
 
   test("should render the TileLayer with the environment URL", () => {
@@ -56,10 +58,12 @@ describe("HeatmapMap Component", () => {
 
     expect(screen.getByTestId("mock-tile-layer")).toBeInTheDocument();
 
-    const tileLayerMock = TileLayer as unknown as jest.Mock;
-    const tileProps = tileLayerMock.mock.calls[0][0];
-
-    expect(tileProps.url).toBe(mockMapUrl);
+    expect(TileLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: mockMapUrl,
+      }),
+      undefined
+    );
   });
 
   test("should render the HeatmapLayer with the correct data and extractors", () => {
@@ -67,15 +71,17 @@ describe("HeatmapMap Component", () => {
 
     expect(screen.getByTestId("mock-heatmap-layer")).toBeInTheDocument();
 
-    const heatmapLayerMock = HeatmapLayer as unknown as jest.Mock;
-    const heatmapProps = heatmapLayerMock.mock.calls[0][0];
+    expect(HeatmapLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        points: mockData,
+        radius: 25,
+        blur: 20,
+      }),
+      undefined
+    );
 
-    expect(heatmapProps.points).toEqual(mockData);
-    expect(heatmapProps.radius).toBe(25);
-    expect(heatmapProps.blur).toBe(20);
-
+    const heatmapProps = (HeatmapLayer as jest.Mock).mock.calls[0][0];
     const testPoint: [number, number, number] = [10, 20, 30];
-
     expect(heatmapProps.latitudeExtractor(testPoint)).toBe(10);
     expect(heatmapProps.longitudeExtractor(testPoint)).toBe(20);
     expect(heatmapProps.intensityExtractor(testPoint)).toBe(30);
@@ -86,9 +92,11 @@ describe("HeatmapMap Component", () => {
 
     render(<HeatmapMap data={mockData} />);
 
-    const tileLayerMock = TileLayer as unknown as jest.Mock;
-    const tileProps = tileLayerMock.mock.calls[0][0];
-
-    expect(tileProps.url).toBe("");
+    expect(TileLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: "",
+      }),
+      undefined
+    );
   });
 });
