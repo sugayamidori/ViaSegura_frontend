@@ -66,7 +66,7 @@ const HeatmapMap: React.FC<HeatmapMapProps> = ({ data }) => {
   return (
     <MapContainer
       center={[-8.05428, -34.8813]}
-      zoom={12}
+      zoom={11}
       style={{ height: "100%", width: "100%" }}
       className="z-0"
     >
