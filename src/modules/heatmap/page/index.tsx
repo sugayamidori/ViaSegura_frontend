@@ -210,8 +210,11 @@ const HeatMap = () => {
 
     return apiData.content
       .map((item) => {
-        const lat = Number(item.latitude);
-        const lng = Number(item.longitude);
+        const coord = item.coordinates?.[0];
+        if (!coord) return null;
+
+        const lat = Number(coord.latitude);
+        const lng = Number(coord.longitude);
 
         if (isNaN(lat) || isNaN(lng)) return null;
 
@@ -221,22 +224,32 @@ const HeatMap = () => {
   }, [apiData]);
 
   const topNeighborhood = useMemo(() => {
-    if (!apiData?.content || apiData.content.length === 0) return "-";
+    if (
+      !apiData?.content ||
+      !Array.isArray(apiData.content) ||
+      apiData.content.length === 0
+    ) {
+      return "-";
+    }
 
     const counts: Record<string, number> = {};
     let maxCount = 0;
     let topName = "-";
 
     apiData.content.forEach((item) => {
-      const name = item.neighborhood;
-      counts[name] = (counts[name] || 0) + 1;
-      if (counts[name] > maxCount) {
-        maxCount = counts[name];
-        topName = name;
+      const coord = item.coordinates?.[0];
+      const name = coord?.neighborhood;
+
+      if (name && typeof name === "string") {
+        counts[name] = (counts[name] || 0) + 1;
+        if (counts[name] > maxCount) {
+          maxCount = counts[name];
+          topName = name;
+        }
       }
     });
 
-    return topName
+    return String(topName || "-")
       .toLowerCase()
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -245,7 +258,12 @@ const HeatMap = () => {
 
   const affectedRegionsCount = useMemo(() => {
     if (!apiData?.content) return 0;
-    return new Set(apiData.content.map((i) => i.neighborhood)).size;
+
+    const neighborhoods = apiData.content
+      .map((i) => i.coordinates?.[0]?.neighborhood)
+      .filter((n): n is string => !!n);
+
+    return new Set(neighborhoods).size;
   }, [apiData]);
 
   useEffect(() => {
