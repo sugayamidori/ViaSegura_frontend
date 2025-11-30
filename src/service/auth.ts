@@ -9,13 +9,13 @@ export const authRegister = async ({
   password,
 }: registerFormInputsProps) => {
   const registerRequest = {
-    nome: username,
+    name: username,
     email,
-    senha: password,
+    password,
   };
 
   const response = await fetchAPI({
-    url: "usuarios",
+    url: "users",
     options: {
       method: "POST",
       headers: {
