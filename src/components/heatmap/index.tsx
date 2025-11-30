@@ -77,11 +77,11 @@ const HeatmapMap: React.FC<HeatmapMapProps> = ({ data }) => {
         longitudeExtractor={(p: HeatmapDataPoint) => p[1]}
         latitudeExtractor={(p: HeatmapDataPoint) => p[0]}
         intensityExtractor={(p: HeatmapDataPoint) => p[2]}
-        radius={30}
+        radius={25}
         blur={20}
         maxZoom={13}
         minOpacity={0.4}
-        max={1.0}
+        max={1}
         gradient={gradient}
         key={mapRerenderKey}
       />

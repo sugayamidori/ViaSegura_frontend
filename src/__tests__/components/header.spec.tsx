@@ -19,7 +19,7 @@ jest.mock("@viasegura/utils/auth", () => ({
 }));
 
 jest.mock("@viasegura/constants/routes", () => ({
-  PROTECTED_ROUTES: ["/heat-map", "/api-dashboard"],
+  PROTECTED_ROUTES: ["/heatmap", "api-dashboard"],
 }));
 
 jest.mock("lucide-react", () => ({
@@ -80,37 +80,33 @@ describe("Header Component", () => {
     });
   });
 
-  describe("Protected Routes behavior", () => {
-    beforeEach(() => {
-      mockUsePathname.mockReturnValue("/heat-map");
-    });
+  test("should render logout button when on a protected route", () => {
+    mockUsePathname.mockReturnValue("/heatmap");
+    render(<Header />);
 
-    test("should render protected layout elements", () => {
-      render(<Header />);
+    expect(screen.getByText("ViaSegura").closest("a")).toHaveAttribute(
+      "href",
+      "#"
+    );
 
-      expect(screen.getByText("ViaSegura").closest("a")).toHaveAttribute(
-        "href",
-        "#"
-      );
+    expect(screen.getByText("Sair")).toBeInTheDocument();
+    expect(screen.getByTestId("icon-logout")).toBeInTheDocument();
+    expect(screen.getByTestId("color-toggle-mock")).toBeInTheDocument();
 
-      expect(screen.getByText("Sair")).toBeInTheDocument();
-      expect(screen.getByTestId("icon-logout")).toBeInTheDocument();
-      expect(screen.getByTestId("color-toggle-mock")).toBeInTheDocument();
+    expect(screen.queryByText("Início")).not.toBeInTheDocument();
+    expect(screen.queryByText("Entrar")).not.toBeInTheDocument();
+    expect(screen.queryByText("Registre-se")).not.toBeInTheDocument();
+  });
 
-      expect(screen.queryByText("Início")).not.toBeInTheDocument();
-      expect(screen.queryByText("Entrar")).not.toBeInTheDocument();
-      expect(screen.queryByText("Registre-se")).not.toBeInTheDocument();
-    });
+  test("should call clearToken and push to /login on logout", () => {
+    mockUsePathname.mockReturnValue("/heatmap");
+    render(<Header />);
 
-    test("should call clearToken and redirect to /login when clicking Logout", () => {
-      render(<Header />);
+    const logoutButton = screen.getByText("Sair");
+    fireEvent.click(logoutButton);
 
-      const logoutButton = screen.getByText("Sair");
-      fireEvent.click(logoutButton);
-
-      expect(mockClearToken).toHaveBeenCalledTimes(1);
-      expect(mockPush).toHaveBeenCalledTimes(1);
-      expect(mockPush).toHaveBeenCalledWith("/login");
-    });
+    expect(mockClearToken).toHaveBeenCalledTimes(1);
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    expect(mockPush).toHaveBeenCalledWith("/login");
   });
 });

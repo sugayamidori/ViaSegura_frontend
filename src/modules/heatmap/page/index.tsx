@@ -1,7 +1,14 @@
 "use client";
 
 import { useMemo, useState, useEffect, useCallback } from "react";
-import { BarChart3, Filter, MapPin, Loader2, RefreshCw } from "lucide-react";
+import {
+  BarChart3,
+  Filter,
+  MapPin,
+  Loader2,
+  RefreshCw,
+  Download,
+} from "lucide-react";
 
 import { Header } from "@viasegura/components/header";
 import { Button } from "@viasegura/components/ui/button";
@@ -11,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@viasegura/components/ui/card";
+import { MonthYearPicker } from "@viasegura/components/monthYearPicker";
 import { PulseLoader } from "@viasegura/components/loader";
 import {
   Select,
@@ -21,21 +29,24 @@ import {
 } from "@viasegura/components/ui/select";
 
 import { HeatmapMap } from "@viasegura/constants/heatmap";
-import { heatmap, neighborhood } from "@viasegura/service/heatmap";
-import { HeatmapParams, HeatmapResponse } from "@viasegura/types/heatmap";
-
-const TIME_PERIODS = [
-  "Last week",
-  "Last month",
-  "Last 3 months",
-  "Last 6 months",
-  "Last year",
-];
+import {
+  heatmap,
+  neighborhood,
+  exportHeatmapData,
+} from "@viasegura/service/heatmap";
+import {
+  HeatmapParams,
+  HeatmapResponse,
+  ExportHeatmapParams,
+} from "@viasegura/types/heatmap";
 
 const HeatMap = () => {
   const [apiData, setApiData] = useState<HeatmapResponse | null>(null);
   const [neighborhoodsList, setNeighborhoodsList] = useState<string[]>(["All"]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
+  const [date, setDate] = useState<Date | undefined>();
+
   const totalIncidents = apiData?.totalElements || 0;
 
   const [filters, setFilters] = useState({
@@ -51,6 +62,7 @@ const HeatMap = () => {
       search: "",
     });
 
+    setDate(undefined);
     fetchHeatmapData("");
   };
 
@@ -91,6 +103,107 @@ const HeatMap = () => {
       console.error("Error loading neighborhoods list:", error);
     }
   }, []);
+
+  const downloadBase64File = (base64Data: any, fileName: string) => {
+    try {
+      if (typeof base64Data !== "string") {
+        console.error(
+          "Download failed: Data provided is not a string.",
+          base64Data
+        );
+        return;
+      }
+
+      const cleanBase64 = base64Data.replace(/^data:.*,/, "");
+
+      const binaryString = atob(cleanBase64);
+      const bytes = new Uint8Array(binaryString.length);
+
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      const blob = new Blob([bytes], { type: "application/vnd.ms-excel" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error processing file download:", error);
+    }
+  };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+
+    try {
+      const params: ExportHeatmapParams = {
+        neighborhood: filters.neighborhood,
+      };
+
+      if (date) {
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+
+        params.start_year = year;
+        params.start_month = month;
+        params.end_year = year;
+        params.end_month = month;
+      }
+
+      const response = await exportHeatmapData(params);
+
+      let base64String = "";
+
+      if (typeof response === "string") {
+        base64String = response;
+      } else if (response && typeof response === "object") {
+        base64String =
+          response.data ||
+          response.base64 ||
+          response.content ||
+          response.file ||
+          "";
+
+        if (!base64String) {
+          console.log(
+            "API response structure unknown, attempting fallback extraction:",
+            response
+          );
+          const firstString = Object.values(response).find(
+            (v) => typeof v === "string"
+          );
+          if (firstString) base64String = firstString as string;
+        }
+      }
+
+      if (base64String) {
+        let fileName = "relatorio_sinistros_geral.xls";
+
+        if (date) {
+          const formattedDate = date
+            .toLocaleDateString("pt-BR", { month: "2-digit", year: "numeric" })
+            .replace("/", "-");
+          fileName = `relatorio_sinistros_${formattedDate}.xls`;
+        }
+
+        downloadBase64File(base64String, fileName);
+      } else {
+        console.error("Failed to find Base64 string in API response.");
+      }
+
+      setIsExporting(false);
+    } catch (error) {
+      console.error("Error exporting data:", error);
+      setIsExporting(false);
+    }
+  };
 
   const heatmapData = useMemo(() => {
     if (!apiData?.content) return [];
@@ -190,27 +303,12 @@ const HeatMap = () => {
                   </SelectContent>
                 </Select>
 
-                <Select
-                  value={filters.period}
-                  onValueChange={(value) =>
-                    setFilters((prev) => ({ ...prev, period: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Período" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TIME_PERIODS.map((period) => (
-                      <SelectItem
-                        key={period}
-                        value={period}
-                        className="cursor-pointer"
-                      >
-                        {period}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <MonthYearPicker
+                  date={date}
+                  setDate={setDate}
+                  className="w-full h-10"
+                />
+
                 <div className="flex gap-2 justify-end">
                   <Button variant="outline" onClick={handleClearFilters}>
                     Limpar Filtros
@@ -340,9 +438,18 @@ const HeatMap = () => {
                   <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    Exportar dados
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start mt-2"
+                    onClick={handleExport}
+                    disabled={isExporting}
+                  >
+                    {isExporting ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4 mr-2" />
+                    )}
+                    {isExporting ? "Gerando arquivo..." : "Exportar dados"}
                   </Button>
                 </CardContent>
               </Card>

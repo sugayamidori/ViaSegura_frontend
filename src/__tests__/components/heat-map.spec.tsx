@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import HeatmapMap from "@viasegura/components/heat-map";
+import HeatmapMap from "@viasegura/components/heatmap";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { HeatmapLayer } from "react-leaflet-heatmap-layer-v3";
 

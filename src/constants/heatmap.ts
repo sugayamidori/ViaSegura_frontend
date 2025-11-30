@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { HeatmapResponse } from "@viasegura/types/heatmap";
 
 export const HeatmapMap = dynamic(
-  () => import("@viasegura/components/heat-map"),
+  () => import("@viasegura/components/heatmap"),
   {
     ssr: false,
   }
@@ -17,4 +17,14 @@ export const EMPTY_RESPONSE: HeatmapResponse = {
   first: true,
   last: true,
   empty: true,
+};
+
+export const HEATMAP_DEFAULTS = {
+  START_YEAR: 2015,
+  END_YEAR: 2024,
+  IGNORED_NEIGHBORHOOD: "All",
+};
+
+export const HEATMAP_ENDPOINTS = {
+  EXPORT: "heatmap/export",
 };
