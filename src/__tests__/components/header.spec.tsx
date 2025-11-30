@@ -68,19 +68,14 @@ describe("Header Component", () => {
         "/"
       );
 
-      expect(screen.getByText("Início")).toBeInTheDocument();
-      expect(screen.getByText("API")).toBeInTheDocument();
-
       expect(screen.getByText("Entrar")).toBeInTheDocument();
       expect(screen.getByText("Registre-se")).toBeInTheDocument();
-
       expect(screen.getByTestId("color-toggle-mock")).toBeInTheDocument();
-
       expect(screen.queryByText("Sair")).not.toBeInTheDocument();
     });
   });
 
-  test("should render logout button when on a protected route", () => {
+  test("should render logout button and nav links when on a protected route", () => {
     mockUsePathname.mockReturnValue("/heatmap");
     render(<Header />);
 
@@ -89,10 +84,11 @@ describe("Header Component", () => {
       "#"
     );
 
+    expect(screen.getByText("API")).toBeInTheDocument();
+    expect(screen.getByText("HEATMAP")).toBeInTheDocument();
     expect(screen.getByText("Sair")).toBeInTheDocument();
     expect(screen.getByTestId("icon-logout")).toBeInTheDocument();
     expect(screen.getByTestId("color-toggle-mock")).toBeInTheDocument();
-
     expect(screen.queryByText("Início")).not.toBeInTheDocument();
     expect(screen.queryByText("Entrar")).not.toBeInTheDocument();
     expect(screen.queryByText("Registre-se")).not.toBeInTheDocument();
