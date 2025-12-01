@@ -33,7 +33,7 @@ import {
   heatmap,
   neighborhood,
   exportHeatmapData,
-} from "@viasegura/service/heatmap";
+} from "@viasegura/services/heatmap";
 import {
   HeatmapParams,
   HeatmapResponse,

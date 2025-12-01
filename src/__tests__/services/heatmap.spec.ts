@@ -2,9 +2,9 @@ import {
   heatmap,
   neighborhood,
   exportHeatmapData,
-} from "@viasegura/service/heatmap";
+} from "@viasegura/services/heatmap";
 
-import { fetchAPI } from "@viasegura/service";
+import { fetchAPI } from "@viasegura/services";
 import { getCookie } from "cookies-next";
 import {
   buildHeatmapQueryParams,
@@ -15,7 +15,7 @@ import {
   HEATMAP_ENDPOINTS,
 } from "@viasegura/constants/heatmap";
 
-jest.mock("@viasegura/service", () => ({
+jest.mock("@viasegura/services", () => ({
   __esModule: true,
   fetchAPI: jest.fn(),
 }));

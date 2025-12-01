@@ -33,8 +33,10 @@ Siga os passos abaixo para configurar o ambiente de desenvolvimento:
     ```bash
     cd ViaSegura/Frontend
     ```
-3.  **Instale as dependências:**
+3.  3.  **Instale as dependências:**
     ```bash
+    yarn install
+    # ou
     npm install
     ```
 
@@ -60,6 +62,8 @@ Para iniciar o servidor de desenvolvimento:
 1.  Abra seu terminal no diretório do projeto.
 2.  Execute o comando:
     ```bash
+    yarn dev
+    # ou
     npm run dev
     ```
     Abra http://localhost:3000 (ou a porta indicada no seu terminal) no seu navegador para ver a aplicação.
@@ -67,7 +71,9 @@ Para iniciar o servidor de desenvolvimento:
 ## 📂 Estrutura
 
 ```
+├── 📂 public/images        # Contém as imagens do projeto
 📂 src
+ ├── 📂 __tests__           # Contém todos os testes unitários da aplicação
  ├── 📂 app                 # Estrutura de rotas e layout da aplicação
  ├── 📂 components          # Components globais do projeto
  ├── 📂 constants           # Define constantes globais. ex.: imagens
@@ -77,6 +83,7 @@ Para iniciar o servidor de desenvolvimento:
  ├── 📂 services            # Estrutura e chamada da API
  ├── 📂 types               # Tipagem global
  ├── 📂 utils               # Contém funções utilitárias reutilizáveis
+ ├── middleware.ts          # Intercepta requisições para aplicar autenticação, redirecionamentos e outras regras globais
 🔑 .env.local               # Contém as variáveis de ambiente do projeto
 ```
 
