@@ -10,17 +10,17 @@ import {
   DropdownMenuTrigger,
 } from "@viasegura/components/ui/dropdown-menu";
 
-type ColorBlindMode = "normal" | "protan" | "tritan" | "achrom";
+type ColorBlindMode = "classico" | "protan" | "tritan" | "achrom";
 
 const colorBlindModes = {
-  normal: { label: "Normal", class: "" },
+  classico: { label: "Clássico", class: "" },
   protan: { label: "Protanopia/Deuteranopia", class: "colorblind-protan" },
   tritan: { label: "Tritanopia", class: "colorblind-tritan" },
   achrom: { label: "Alto Contraste", class: "colorblind-achrom" },
 };
 
 export const ColorBlindnessToggle = () => {
-  const [mode, setMode] = useState<ColorBlindMode>("normal");
+  const [mode, setMode] = useState<ColorBlindMode>("classico");
 
   const applyMode = (newMode: ColorBlindMode) => {
     const root = document.documentElement;
@@ -58,13 +58,13 @@ export const ColorBlindnessToggle = () => {
           aria-label="Alternar modo de acessibilidade visual"
         >
           <Eye className="h-5 w-5" />
-          {mode !== "normal" && (
+          {mode !== "classico" && (
             <Palette className="absolute bottom-0 right-0 h-3 w-3 text-accent" />
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Modo de Cores</DropdownMenuLabel>
+        <DropdownMenuLabel>Acessibilidade</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {Object.entries(colorBlindModes).map(([key, { label }]) => (
           <DropdownMenuItem

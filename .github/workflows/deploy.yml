@@ -1,43 +1,119 @@
-name: Deploy Frontend 
+name: Deploy Frontend to AWS EC2
 
 on:
   push:
     branches:
-      - main  
+      - main      # Production
+      - staging   # Staging
+
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
-    steps:
-     
-      - name: Checkout do código
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'yarn'
-
-
-      - name: Install and Build
-        run: |
-          yarn install --frozen-lockfile
-          yarn build
-        env:
-          CI: false 
-
     
-      - name: Configure AWS Credentials
+    steps:
+      # 1. Checkout do código
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      # 2. Determinar ambiente baseado na branch
+      - name: Set environment variables
+        id: env
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "ENVIRONMENT=production" >> $GITHUB_OUTPUT
+            echo "EC2_HOST=${{ secrets.EC2_PROD_HOST }}" >> $GITHUB_OUTPUT
+            echo "EC2_USER=${{ secrets.EC2_PROD_USER }}" >> $GITHUB_OUTPUT
+            echo "SSH_KEY<<EOF" >> $GITHUB_OUTPUT
+            echo "${{ secrets.EC2_PROD_SSH_KEY }}" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "ENVIRONMENT=staging" >> $GITHUB_OUTPUT
+            echo "EC2_HOST=${{ secrets.EC2_STAGING_HOST }}" >> $GITHUB_OUTPUT
+            echo "EC2_USER=${{ secrets.EC2_STAGING_USER }}" >> $GITHUB_OUTPUT
+            echo "SSH_KEY<<EOF" >> $GITHUB_OUTPUT
+            echo "${{ secrets.EC2_STAGING_SSH_KEY }}" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+      
+      # 3. Configurar credenciais AWS
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # Ajustar para a região bucket 
-  
-     
-      - name: Deploy to S3
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      # 4. Login no Amazon ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      # 5. Build e Push da imagem Docker para ECR
+      - name: Build and push Docker image to ECR
+        env:
+          ECR_REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}
+          ECR_REPOSITORY: via-segura-frontend
+          IMAGE_TAG: ${{ github.sha }}
+          ENVIRONMENT: ${{ steps.env.outputs.ENVIRONMENT }}
         run: |
-          aws s3 sync ./out s3://NOME-DO-SEU-BUCKET --delete
-
-     
+          echo "Building Docker image..."
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$ENVIRONMENT-latest
+          
+          echo "Pushing to ECR..."
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$ENVIRONMENT-latest
+          
+          echo "✅ Image pushed: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "✅ Image tagged: $ECR_REGISTRY/$ECR_REPOSITORY:$ENVIRONMENT-latest"
+      
+      # 6. Deploy na EC2 via SSH
+      - name: Deploy to EC2 (${{ steps.env.outputs.ENVIRONMENT }})
+        env:
+          EC2_HOST: ${{ steps.env.outputs.EC2_HOST }}
+          EC2_USER: ${{ steps.env.outputs.EC2_USER }}
+          SSH_KEY: ${{ steps.env.outputs.SSH_KEY }}
+          ECR_REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}
+          ECR_REPOSITORY: via-segura-frontend
+          IMAGE_TAG: ${{ github.sha }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          ENVIRONMENT: ${{ steps.env.outputs.ENVIRONMENT }}
+        run: |
+          # Salvar chave SSH em arquivo temporário
+          echo "$SSH_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          
+          echo "Deploying to $ENVIRONMENT environment..."
+          
+          # Conectar via SSH e atualizar container
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'ENDSSH'
+            set -e
+            
+            echo "🔐 Login no ECR..."
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
+              docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}
+            
+            echo "📁 Navegando para diretório da aplicação..."
+            cd /home/ubuntu/viasegura || cd ~/viasegura || { echo "❌ Diretório não encontrado"; exit 1; }
+            
+            echo "🎯 Definindo imagem: ${{ secrets.AWS_ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
+            export FRONTEND_IMAGE=${{ secrets.AWS_ECR_REGISTRY }}/via-segura-frontend:${{ github.sha }}
+            
+            echo "⬇️ Pulling nova imagem..."
+            docker pull $FRONTEND_IMAGE
+            
+            echo "🔄 Atualizando container app-frontend..."
+            docker-compose up -d app-frontend
+            
+            echo "🧹 Limpando imagens antigas..."
+            docker image prune -af --filter "until=24h"
+            
+            echo "✅ Deploy concluído com sucesso!"
+            echo "📊 Status dos containers:"
+            docker-compose ps
+          ENDSSH
+          
+          # Remover chave SSH temporária
+          rm -f private_key.pem
+          
+          echo "🎉 Deploy para $ENVIRONMENT finalizado!"
