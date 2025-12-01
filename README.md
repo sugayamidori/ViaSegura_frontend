@@ -27,7 +27,7 @@ Siga os passos abaixo para configurar o ambiente de desenvolvimento:
 
 1.  **Clone o repositório:**
     ```bash
-    git clone https://github.com/sugayamidori/ViaSegura.git
+    git clone https://github.com/sugayamidori/ViaSegura_frontend.git
     ```
 2.  **Navegue até o diretório do projeto:**
     ```bash
@@ -84,7 +84,7 @@ Para iniciar o servidor de desenvolvimento:
  ├── 📂 types               # Tipagem global
  ├── 📂 utils               # Contém funções utilitárias reutilizáveis
  ├── middleware.ts          # Intercepta requisições para aplicar autenticação, redirecionamentos e outras regras globais
-🔑 .env.local               # Contém as variáveis de ambiente do projeto
+🔑 .env                     # Contém as variáveis de ambiente do projeto
 ```
 
 ## 🧑‍💻Tecnologias
