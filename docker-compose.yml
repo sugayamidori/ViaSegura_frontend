@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: viasegura-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - viasegura-network
+
+  frontend-dev:
+    image: node:20-alpine
+    container_name: viasegura-frontend-dev
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+    command: sh -c "yarn install && yarn dev"
+    profiles:
+      - dev
+    networks:
+      - viasegura-network
+
+networks:
+  viasegura-network:
+    driver: bridge
